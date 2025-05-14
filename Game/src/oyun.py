@@ -45,7 +45,50 @@ TOHUM_TURLERI = {
 }
 
 # Görselleri yükleme
+WHEAT_SEEDS_IMG = pygame.image.load("Assets/Urunler/Wheat_Seeds.png")
+WHEAT_STAGE_5_IMG = pygame.image.load("Assets/Urunler/Wheat_Stage_5.png")
+CORN_SEEDS_IMG = pygame.image.load("Assets/Urunler/Corn_Seeds.png")
+CORN_STAGE_6_IMG = pygame.image.load("Assets/Urunler/Corn_Stage_6.png")
+CARROT_SEEDS_IMG = pygame.image.load("Assets/Urunler/Carrot_Seeds.png")
+CARROT_STAGE_4_IMG = pygame.image.load("Assets/Urunler/Carrot_Stage_4.png")
+BEET_SEEDS_IMG = pygame.image.load("Assets/Urunler/Beet_Seeds.png")
+BEET_STAGE_5_IMG = pygame.image.load("Assets/Urunler/Beet_Stage_5.png")
+STRAWBERRY_SEEDS_IMG = pygame.image.load("Assets/Urunler/Strawberry_Seeds.png")
+STRAWBERRY_STAGE_6_IMG = pygame.image.load("Assets/Urunler/Strawberry_Stage_6.png")
+SUNFLOWER_SEEDS_IMG = pygame.image.load("Assets/Urunler/Sunflower_Seeds.png")
+SUNFLOWER_STAGE_6_IMG = pygame.image.load("Assets/Urunler/Sunflower_Stage_5.png")
+FLOORING_IMG = pygame.image.load("Assets/Backgrounds/Flooring_50.png")
+FLOORING_UNTILLED_IMG = pygame.image.load("Assets/Backgrounds/Flooring_62.png")  # Sürülmemiş tarla
+FLOORING_TILLED_IMG = pygame.image.load("Assets/Backgrounds/Flooring_58.png")    # Sürülmüş tarla
+BARN_IMG = pygame.image.load("Assets/Builds/144px-Deluxe_Barn.png")
+COOP_IMG = pygame.image.load("Assets/Builds/144px-Coop.png")
+COW_IMG = pygame.image.load("Assets/Sprites/White_Cow.png")
+CHICKEN_IMG = pygame.image.load("Assets/Sprites/White_Chicken.png")
+MILK_IMG = pygame.image.load("Assets/Urunler/Milk_TR.png")
+EGG_IMG = pygame.image.load("Assets/Urunler/Egg.png")
+CARROT_IMG= pygame.image.load("Assets/Urunler/Carrot.png")
+STRAWBERRY_IMG= pygame.image.load("Assets/Urunler/Strawberry.png")
+SUNFLOWER_IMG= pygame.image.load("Assets/Urunler/Sunflower.png")
+WHEAT_IMG= pygame.image.load("Assets/Urunler/Wheat.png")
+CORN_IMG= pygame.image.load("Assets/Urunler/Corn.png")
+BEET_IMG= pygame.image.load("Assets/Urunler/Beet.png")
+BAKKAL_IMG = pygame.image.load("Assets/Builds/bakkal.png")
+AHIR_IC_IMG = pygame.image.load("Assets/Backgrounds/ahır_iç_son.png")
+YOL_IMG = pygame.image.load("Assets/Backgrounds/yol.png")
+AGAC_IMG = pygame.image.load("Assets/Sprites/ağac.png")
+IMALATHANE_IMG = pygame.image.load("Assets/Builds/imalathane2.png")
+pygame.mixer.init()
+EKIN_TOPLAMA_SOUND = pygame.mixer.Sound("Assets/Sounds/ekin_toplama.wav")
+CHICKEN_SOUND = pygame.mixer.Sound("Assets/Sounds/Chicken Sound Effect.mp3")
+COW_SOUND = pygame.mixer.Sound("Assets/Sounds/İnek Sesi.ogg.opus")
+SATINALIM_SOUND = pygame.mixer.Sound("Assets/Sounds/Satın Alım Satım.mp3")
+CAR_IMG = pygame.image.load("Assets/Builds/Araba.png")
+KORNA_SOUND = pygame.mixer.Sound("Assets/Sounds/Korna.mp3")
 
+ADAM_SAG_SHEET = pygame.image.load("Assets/Sprites/adamsag.png")         # sağa bakan sprite sheet
+ADAM_SOL_SHEET = pygame.image.load("Assets/Sprites/adamsol.png")         # sola bakan sprite sheet
+ARKADAN_BAK_SHEET = pygame.image.load("Assets/Sprites/arkadanbak.png")   # yukarı bakan sprite sheet
+ONDEN_BAKIS_SHEET = pygame.image.load("Assets/Sprites/öndenbakış.png")   # aşağı bakan sprite sheet
 
 # Animasyon karelerini yükleyin
 def load_animation_frames(sprite_sheet, frame_width, frame_height):
