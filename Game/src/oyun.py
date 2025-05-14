@@ -99,11 +99,74 @@ def load_agac_frames(sheet, frame_width=64, frame_height=64):
 
 class Player:
   def __init__(self, x, y):
+    
+        self.rect = pygame.Rect(x * TILE_SIZE + 100, y * TILE_SIZE + 100, TILE_SIZE, TILE_SIZE)
+        self.inventory = {
+            "tohum_buğday": 5,
+            "tohum_mısır": 5,
+            "tohum_havuç": 5,
+            "tohum_pancar": 5,
+            "tohum_çilek": 5,
+            "tohum_ayçiçek": 5,
+            "buğday": 0,  
+            "mısır": 0,
+            "havuç": 0,
+            "pancar": 0,
+            "çilek": 0,
+            "ayçiçek": 0,
+            "süt": 0,  
+            "yumurta": 0,  
+            "ürün": 0,
+            "para": 50
+        }
+        self.selected_seed = "buğday"  
+        self.anim_frame = 0
+        self.last_anim_update = 0
+        self.direction = "down"  
 
-  def move(self, dx, dy):
+    def move(self, dx, dy):
+        new_rect = self.rect.move(dx * TILE_SIZE, dy * TILE_SIZE)
 
-  def update_animation(self):
+        if new_rect.left < 0 or new_rect.right > WIDTH or new_rect.top < 0 or new_rect.bottom > HEIGHT:
+            return
+        if INFO_BAR_RECT.colliderect(new_rect):
+            return        
+        def upper_part(rect, bottom_margin=30):
+            return pygame.Rect(rect.x, rect.y, rect.width, rect.height - bottom_margin)
 
+        if (
+            upper_part(AHIR_RECT).colliderect(new_rect) or
+            upper_part(KUMES_RECT).colliderect(new_rect) or
+            upper_part(IMALATHANE_RECT).colliderect(new_rect) or
+            upper_part(SATIS_RECT).colliderect(new_rect)
+        ):
+            return  
+
+        self.rect = new_rect
+
+        if dx > 0:
+            self.direction = "right"
+        elif dx < 0:
+            self.direction = "left"
+        elif dy > 0:
+            self.direction = "down"
+        elif dy < 0:
+            self.direction = "up"
+
+    def update_animation(self):
+        now = pygame.time.get_ticks()
+        
+        if now - self.last_anim_update > 150:
+            if self.direction == "right":
+                frame_count = len(FRAMES_RIGHT)
+            elif self.direction == "left":
+                frame_count = len(FRAMES_LEFT)
+            elif self.direction == "up":
+                frame_count = len(FRAMES_UP)
+            else:
+                frame_count = len(FRAMES_DOWN)
+            self.anim_frame = (self.anim_frame + 1) % frame_count
+            self.last_anim_update = now
 
 class Tile:
   def __init__(self):
