@@ -364,8 +364,240 @@ print(COW_SPRITESHEET.get_size())  # Sprite sheet'in boyutlarını yazdır
 def satış_arayüzü():
 
 def kümes_arayuzu():
+    global chickens
+    kümes_rect = pygame.Rect(40, 40, WIDTH - 120, HEIGHT - 40)
+    player_rect = pygame.Rect(100, 250, TILE_SIZE, TILE_SIZE)
+    direction = "down"
+    anim_frame = 0
+    last_anim_update = 0
 
+    KUMES_IC_IMG = pygame.image.load("Assets/Backgrounds/kümes_iç.png")
+
+    for i, animal in enumerate(chickens):
+        while True:
+            animal["rect"].x = random.randint(50, WIDTH - 110)
+            animal["rect"].y = random.randint(350, HEIGHT - 110)
+            if not any(animal["rect"].colliderect(other["rect"]) for j, other in enumerate(chickens) if i != j):
+                break
+        animal["dir"] = random_direction()
+        animal["anim_frame"] = random.randint(0, TAVUK_ANIM_LEN - 1)
+        animal["last_anim_update"] = pygame.time.get_ticks()
+
+    running = True
+    while running:
+        screen.blit(pygame.transform.scale(KUMES_IC_IMG, (WIDTH, HEIGHT)), (0, 0))
+
+        for animal in chickens:
+            if "dx" not in animal or "dy" not in animal:
+                animal["dx"] = random.choice([-2, -1, 0, 1, 2])
+                animal["dy"] = random.choice([-2, -1, 0, 1, 2])
+            if random.randint(0, 100) < 8:
+                animal["dx"] = random.choice([-2, -1, 0, 1, 2])
+                animal["dy"] = random.choice([-2, -1, 0, 1, 2])
+
+            new_rect = animal["rect"].move(animal["dx"]* 0.5, animal["dy"]* 0.5)
+
+            if not kümes_rect.contains(new_rect):
+                animal["dx"] = random.choice([-2, -1, 0, 1, 2])
+                animal["dy"] = random.choice([-2, -1, 0, 1, 2])
+            else:
+                if not any(new_rect.colliderect(other["rect"]) for other in chickens if other != animal):
+                    animal["rect"] = new_rect
+            now = pygame.time.get_ticks()
+            if now - animal["last_anim_update"] > 200:
+                animal["anim_frame"] = (animal["anim_frame"] + 1) % TAVUK_ANIM_LEN
+                animal["last_anim_update"] = now
+
+            tavuk_img = pygame.transform.scale(TAVUK_FRAMES[animal["anim_frame"]], (30, 30))
+            screen.blit(tavuk_img, animal["rect"].topleft)
+
+            if animal["fed_time"] or animal["egg"]:
+                elapsed_time = time.time() - animal["fed_time"] if animal["fed_time"] else 30
+                progress = min(elapsed_time / 30, 1)
+                bar_width = int(60 * progress)
+                bar_rect = pygame.Rect(animal["rect"].x, animal["rect"].y - 10, 60, 5)
+                pygame.draw.rect(screen, GRAY, bar_rect)
+                pygame.draw.rect(screen, GREEN, (bar_rect.x, bar_rect.y, bar_width, bar_rect.height))
+                if progress >= 1:
+                    animal["egg"] = True
+                    animal["fed_time"] = None
+
+        now = pygame.time.get_ticks()
+        if now - last_anim_update > 150:
+            if direction == "right":
+                frame_count = len(FRAMES_RIGHT)
+            elif direction == "left":
+                frame_count = len(FRAMES_LEFT)
+            elif direction == "up":
+                frame_count = len(FRAMES_UP)
+            else:
+                frame_count = len(FRAMES_DOWN)
+            anim_frame = (anim_frame + 1) % frame_count
+            last_anim_update = now
+
+        if direction == "right":
+            char_img = FRAMES_RIGHT[anim_frame]
+        elif direction == "left":
+            char_img = FRAMES_LEFT[anim_frame]
+        elif direction == "up":
+            char_img = FRAMES_UP[anim_frame]
+        else:
+            char_img = FRAMES_DOWN[anim_frame]
+
+        screen.blit(pygame.transform.scale(char_img, (TILE_SIZE, TILE_SIZE)), player_rect.topleft)
+
+        pygame.display.flip()
+        clock.tick(30)
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    return
+
+        keys = pygame.key.get_pressed()
+        dx = dy = 0
+        if keys[pygame.K_LEFT]: dx = -TILE_SIZE; direction = "left"
+        if keys[pygame.K_RIGHT]: dx = TILE_SIZE; direction = "right"
+        if keys[pygame.K_UP]: dy = -TILE_SIZE; direction = "up"
+        if keys[pygame.K_DOWN]: dy = TILE_SIZE; direction = "down"
+
+        new_rect = player_rect.move(dx * 0.2, dy * 0.2)  
+        if kümes_rect.contains(new_rect):
+            collision = False
+            for animal in chickens:
+                if new_rect.colliderect(animal["rect"]):
+                    collision = True
+                    if keys[pygame.K_SPACE] and animal["egg"]:
+                        animal["egg"] = False
+                        player.inventory["yumurta"] += 1
+                        CHICKEN_SOUND.play()
+                        print("Yumurta toplandı!")
+                    elif keys[pygame.K_b] and not animal["egg"] and not animal["fed_time"]:
+                        if player.inventory.get("mısır", 0) > 0:
+                            player.inventory["mısır"] -= 1
+                            animal["fed_time"] = time.time()
+                            CHICKEN_SOUND.play()
+                            print("Tavuk beslendi!")
+                        else:
+                            print("Yeterli mısır yok!")
+            if not collision:
+                player_rect = new_rect
 def ahir_arayuzu():
+    global cows
+    ahir_rect = pygame.Rect(40, 40, WIDTH - 120, HEIGHT - 40)
+    player_rect = pygame.Rect(100, 180, TILE_SIZE, TILE_SIZE)
+    direction = "down"
+    anim_frame = 0
+    last_anim_update = 0
+
+    for i, animal in enumerate(cows):
+        while True:
+            animal["rect"].x = random.randint(50, WIDTH - 110)
+            animal["rect"].y = random.randint(350, HEIGHT - 110)
+            if not any(animal["rect"].colliderect(other["rect"]) for j, other in enumerate(cows) if i != j):
+                break
+        animal["dir"] = random_direction()
+
+    running = True
+    while running:
+        screen.blit(pygame.transform.scale(AHIR_IC_IMG, (WIDTH, HEIGHT)), (0, 0))
+
+        for animal in cows:
+            if "dx" not in animal or "dy" not in animal:
+                animal["dx"] = random.choice([-2, -1, 0, 1, 2])
+                animal["dy"] = random.choice([-2, -1, 0, 1, 2])
+            if random.randint(0, 100) < 8:
+                animal["dx"] = random.choice([-2, -1, 0, 1, 2])
+                animal["dy"] = random.choice([-2, -1, 0, 1, 2])
+
+            new_rect = animal["rect"].move(animal["dx"] * 0.5, animal["dy"] * 0.5)
+            if not ahir_rect.contains(new_rect):
+                animal["dx"] = random.choice([-2, -1, 0, 1, 2])
+                animal["dy"] = random.choice([-2, -1, 0, 1, 2])
+            else:
+                if not any(new_rect.colliderect(other["rect"]) for other in cows if other != animal):
+                    animal["rect"] = new_rect
+
+            inek_img = pygame.transform.scale(COW_IMG, (60, 60))
+            screen.blit(inek_img, animal["rect"].topleft)
+
+            if animal["fed_time"] or animal["milk"]:
+                elapsed_time = time.time() - animal["fed_time"] if animal["fed_time"] else 60
+                progress = min(elapsed_time / 60, 1)
+                bar_width = int(60 * progress)
+                bar_rect = pygame.Rect(animal["rect"].x, animal["rect"].y - 10, 60, 5)
+                pygame.draw.rect(screen, GRAY, bar_rect)
+                pygame.draw.rect(screen, GREEN, (bar_rect.x, bar_rect.y, bar_width, bar_rect.height))
+                if progress >= 1:
+                    animal["milk"] = True
+                    animal["fed_time"] = None
+
+        now = pygame.time.get_ticks()
+        if now - last_anim_update > 150:
+            if direction == "right":
+                frame_count = len(FRAMES_RIGHT)
+            elif direction == "left":
+                frame_count = len(FRAMES_LEFT)
+            elif direction == "up":
+                frame_count = len(FRAMES_UP)
+            else:
+                frame_count = len(FRAMES_DOWN)
+            anim_frame = (anim_frame + 1) % frame_count
+            last_anim_update = now
+
+        if direction == "right":
+            char_img = FRAMES_RIGHT[anim_frame]
+        elif direction == "left":
+            char_img = FRAMES_LEFT[anim_frame]
+        elif direction == "up":
+            char_img = FRAMES_UP[anim_frame]
+        else:
+            char_img = FRAMES_DOWN[anim_frame]
+
+        screen.blit(pygame.transform.scale(char_img, (TILE_SIZE, TILE_SIZE)), player_rect.topleft)
+
+        pygame.display.flip()
+        clock.tick(30)
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    return
+
+        keys = pygame.key.get_pressed()
+        dx = dy = 0
+        if keys[pygame.K_LEFT]: dx = -TILE_SIZE; direction = "left"
+        if keys[pygame.K_RIGHT]: dx = TILE_SIZE; direction = "right"
+        if keys[pygame.K_UP]: dy = -TILE_SIZE; direction = "up"
+        if keys[pygame.K_DOWN]: dy = TILE_SIZE; direction = "down"
+
+        new_rect = player_rect.move(dx * 0.2, dy * 0.2) 
+        if ahir_rect.contains(new_rect):
+            collision = False
+            for animal in cows:
+                if new_rect.colliderect(animal["rect"]):
+                    collision = True
+                    if keys[pygame.K_SPACE] and animal["milk"]:
+                        animal["milk"] = False
+                        player.inventory["süt"] += 1
+                        COW_SOUND.play()
+                        print("Süt toplandı!")
+                    elif keys[pygame.K_b] and not animal["milk"] and not animal["fed_time"]:
+                        if player.inventory.get("buğday", 0) > 0:
+                            player.inventory["buğday"] -= 1
+                            animal["fed_time"] = time.time()
+                            COW_SOUND.play()
+                            print("İnek beslendi!")
+                        else:
+                            print("Yeterli buğday yok!")
+            if not collision:
+                player_rect = new_rect
 
 # İmalathane ürünleri ve gereksinimleri
 products = [
