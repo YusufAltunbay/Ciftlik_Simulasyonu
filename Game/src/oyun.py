@@ -232,6 +232,10 @@ current_production = {
 }
 
 def draw_buildings():
+    screen.blit(pygame.transform.scale(BARN_IMG, (AHIR_RECT.width, AHIR_RECT.height)), (AHIR_RECT.x, AHIR_RECT.y))
+    screen.blit(pygame.transform.scale(COOP_IMG, (KUMES_RECT.width, KUMES_RECT.height)), (KUMES_RECT.x, KUMES_RECT.y))
+    screen.blit(pygame.transform.scale(IMALATHANE_IMG, (IMALATHANE_RECT.width, IMALATHANE_RECT.height)), (IMALATHANE_RECT.x, IMALATHANE_RECT.y))
+    screen.blit(pygame.transform.scale(BAKKAL_IMG, (SATIS_RECT.width, SATIS_RECT.height)), (SATIS_RECT.x, SATIS_RECT.y))
 
 def draw_farm():
 
