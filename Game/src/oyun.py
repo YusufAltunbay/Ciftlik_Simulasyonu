@@ -238,6 +238,62 @@ def draw_buildings():
     screen.blit(pygame.transform.scale(BAKKAL_IMG, (SATIS_RECT.width, SATIS_RECT.height)), (SATIS_RECT.x, SATIS_RECT.y))
 
 def draw_farm():
+    for y in range(GRID_HEIGHT):
+        for x in range(GRID_WIDTH):
+            rect = pygame.Rect(100 + x * TILE_SIZE, 100 + y * TILE_SIZE, TILE_SIZE, TILE_SIZE)
+            tile = farm_grid[y][x]
+            
+            if tile.tilled:
+                screen.blit(pygame.transform.scale(FLOORING_TILLED_IMG, rect.size), rect.topleft)
+            else:
+                screen.blit(pygame.transform.scale(FLOORING_UNTILLED_IMG, rect.size), rect.topleft)
+
+            if tile.crop:
+                elapsed = time.time() - tile.planted_time if tile.planted_time else 0
+                growth_time = TOHUM_TURLERI[tile.crop]["büyüme_suresi"]
+
+                if elapsed < growth_time: 
+                    if tile.crop == "buğday":
+                        screen.blit(pygame.transform.scale(WHEAT_SEEDS_IMG, rect.size), rect.topleft)
+                    elif tile.crop == "mısır":
+                        screen.blit(pygame.transform.scale(CORN_SEEDS_IMG, rect.size), rect.topleft)
+                    elif tile.crop == "havuç":
+                        screen.blit(pygame.transform.scale(CARROT_SEEDS_IMG, rect.size), rect.topleft)
+                    elif tile.crop == "pancar":
+                        screen.blit(pygame.transform.scale(BEET_SEEDS_IMG, rect.size), rect.topleft)
+                    elif tile.crop == "çilek":
+                        screen.blit(pygame.transform.scale(STRAWBERRY_SEEDS_IMG, rect.size), rect.topleft)
+                    elif tile.crop == "ayçiçek":
+                        screen.blit(pygame.transform.scale(SUNFLOWER_SEEDS_IMG, rect.size), rect.topleft)
+
+                    # Büyüme çubuğu
+                    progress = min(elapsed / growth_time, 1)  
+                    bar_width = TILE_SIZE - 10
+                    bar_height = 5
+                    bar_x = rect.x + 5
+                    bar_y = rect.y + TILE_SIZE - 10
+                    pygame.draw.rect(screen, WHITE, (bar_x, bar_y, bar_width, bar_height), 2)  # Çerçeve
+                    pygame.draw.rect(screen, GREEN, (bar_x, bar_y, int(bar_width * progress), bar_height))  # Dolan kısım
+                else: 
+                    if tile.crop == "buğday":
+                        screen.blit(pygame.transform.scale(WHEAT_STAGE_5_IMG, rect.size), rect.topleft)
+                    elif tile.crop == "mısır":
+                        screen.blit(pygame.transform.scale(CORN_STAGE_6_IMG, rect.size), rect.topleft)
+                    elif tile.crop == "havuç":
+                        screen.blit(pygame.transform.scale(CARROT_STAGE_4_IMG, rect.size), rect.topleft)
+                    elif tile.crop == "pancar":
+                        screen.blit(pygame.transform.scale(BEET_STAGE_5_IMG, rect.size), rect.topleft)
+                    elif tile.crop == "çilek":
+                        screen.blit(pygame.transform.scale(STRAWBERRY_STAGE_6_IMG, rect.size), rect.topleft)
+                    elif tile.crop == "ayçiçek":
+                        screen.blit(pygame.transform.scale(SUNFLOWER_STAGE_6_IMG, rect.size), rect.topleft)
+
+            
+            if tile.watered:
+                pygame.draw.rect(screen, WATER, rect, 3) 
+            else:
+                pygame.draw.rect(screen, BROWN, rect, 3)  
+
 
 def get_tile_coords():
 
