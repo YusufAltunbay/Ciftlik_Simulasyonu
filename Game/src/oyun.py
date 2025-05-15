@@ -169,21 +169,79 @@ class Player:
             self.last_anim_update = now
 
 class Tile:
-  def __init__(self):
+    def __init__(self):
+        self.tilled = False  # Tarla sürülmüş mü?
+        new_rect = self.rect.move(dx * TILE_SIZE, dy * TILE_SIZE)
 
-  def update_animation(self):
+        # Ekran sınırları içinde mi?
+        if new_rect.left < 0 or new_rect.right > WIDTH or new_rect.top < 0 or new_rect.bottom > HEIGHT:
+            return  # Ekran sınırlarını aşarsa hareket etme
+
+        # Bilgi çubuğu alanına çarpmıyor mu?
+        if INFO_BAR_RECT.colliderect(new_rect):
+            return  # Bilgi çubuğuna çarptığında hareket etme
+
+        # Binalarla çakışıyor mu?
+        if not (new_rect.colliderect(AHIR_RECT) or
+                new_rect.colliderect(KUMES_RECT) or
+                new_rect.colliderect(IMALATHANE_RECT) or
+                new_rect.colliderect(SATIS_RECT)):
+            self.rect = new_rect
+
+        if dx > 0:
+            self.direction = "right"
+        elif dx < 0:
+            self.direction = "left"
+        elif dy > 0:
+            self.direction = "down"
+        elif dy < 0:
+            self.direction = "up"
+
+    def update_animation(self):
+        now = pygame.time.get_ticks()
+        frames = GUY_DIRECTIONAL_FRAMES[self.direction]
+        if now - self.last_anim_update > 150:
+            self.anim_frame = (self.anim_frame + 1) % len(frames)
+            self.last_anim_update = now
 
 class Tile:
-  def __init__(self):
+    def __init__(self):
+        self.tilled = False  # Tarla sürülmüş mü?
+        self.crop = None  # Ekili ürün
+        self.planted_time = None  # Olgunlaşma süresinin başladığı zaman
+        self.watered = False  # Sulanmış mı?
 
-  def till(self):
+    def till(self):
+        # Tarlayı sürme işlemi
+        self.tilled = True
 
-  def plant(self, tohum_turu):
+    def plant(self, tohum_turu):
+        if self.tilled and self.crop is None:
+            self.crop = tohum_turu
+            self.watered = False  # Sulanmadığı için olgunlaşma başlamaz
+            self.planted_time = None  # Olgunlaşma süresi başlamaz
+            return True  # Ekim başarılı
+        return False  # Ekim başarısız
 
-  def water(self):
+    def water(self):
+        if self.crop and not self.watered:
+            self.watered = True
+            self.planted_time = time.time()  # Sulandıktan sonra olgunlaşma süresi başlar
+            return True  # Sulama başarılı
+        return False  # Sulama başarısız
 
-  def harvest(self):
-
+    def harvest(self):
+        # Hasat işlemi
+        if self.crop and self.watered:
+            elapsed = time.time() - self.planted_time if self.planted_time else 0
+            if elapsed >= TOHUM_TURLERI[self.crop]["büyüme_suresi"]:
+                harvested_crop = self.crop  # Hasat edilen ürünü kaydet
+                self.crop = None
+                self.tilled = False
+                self.planted_time = None
+                self.watered = False
+                return harvested_crop  # Hasat edilen ürünün adını döndür
+        return None  # Hasat başarısız
 # === Başlat ===
 player = Player(0, 0)
 farm_grid = [[Tile() for _ in range(GRID_WIDTH)] for _ in range(GRID_HEIGHT)]
