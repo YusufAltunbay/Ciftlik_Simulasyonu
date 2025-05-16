@@ -47,70 +47,38 @@ while running:
 
 Aşağıda projede kullanılan tüm görseller listelenmiştir:
 
-### Ürünler & Tohumlar
-- `Wheat_Seeds.png`
-- `Corn_Seeds.png`
-- `Carrot_Seeds.png`
-- `Beet_Seeds.png`
-- `Strawberry_Seeds.png`
-- `Sunflower_Seeds.png`
-- `Wheat_Stage_5.png`
-- `Corn_Stage_6.png`
-- `Carrot_Stage_4.png`
-- `Beet_Stage_5.png`
-- `Strawberry_Stage_6.png`
-- `Sunflower_Stage_6.png`
-- `Milk_TR.png`
-- `Egg.png`
-- `flour.jpg`
-- `Mayonnaise.png`
-- `Cheese.png`
-- `Oil.png`
-- `Sugar.png`
-- `Pink_Cake.png`
-- `Cookie.png`
-- `Ice_cream.png`
-- `ayran.webp`
+### Ürünler 
+![Buğday](Game/Assets/Urunler/Wheat.png)
+![Mısır](Game/Assets/Urunler/Corn.png)
+![Havuç](Game/Assets/Urunler/Carrot.png)
+![Pancar](Game/Assets/Urunler/Beet.png)
+![Çilek](Game/Assets/Urunler/Strawberry.png)
+![Ayçiçeği](Game/Assets/Urunler/Sunflower.png)
+![Süt](Game/Assets/Urunler/Milk_TR.png)
+![Yumurta](Game/Assets/Urunler/Egg.png)
+![Yoğurt](Game/Assets/Urunler/Mayonnaise.png)
+![Peynir](Game/Assets/Urunler/Cheese.png)
+![Yağ](Game/Assets/Urunler/Oil.png)
+![Şeker](Game/Assets/Urunler/Sugar.png)
+![Pasta](Game/Assets/Urunler/Pink_Cake.png)
+![Kurabiye](Game/Assets/Urunler/Cookie.png)
+![Dondurma](Game/Assets/Urunler/Ice_Cream.png)
 
-### Arka Plan ve Zemin
-- `Flooring_50.png`
-- `Flooring_62.png`
-- `Flooring_58.png`
-- `arka_plan.jpg`
-- `yol.png`
-- `ahır_iç_son.png`
-- `kümes_iç.png`
 
 ### Yapılar
-- `144px-Deluxe_Barn.png`
-- `144px-Coop.png`
-- `imalathane2.png`
-- `bakkal.png`
-- `Araba.png`
+![Ahır](Game/Assets/Builds/144px-Deluxe_Barn.png)
+![Kümes](Game/Assets/Builds/144px-Coop.png)
+![Market](Game/Assets/Builds/bakkal.png)
+![Araba](Game/Assets/Builds/Araba.png)
 
-### Karakterler ve Hayvanlar
-- `adamsag.png`
-- `adamsol.png`
-- `arkadanbak.png`
-- `öndenbakış.png`
-- `White_Cow.png`
-- `White_Chicken.png`
-- `tavuk.png`
-- `ağac.png`
+### Oyun İçi Görüntüler
+-![Oyun_Ekranı](Game/Assets/Oyun_Ekranı.png)
+-![Ahır_arayüzü](Game/Assets/Ahır_Arayüzü.png)
+
 
 ---
 
-## 🔊 Kullanılan Ses Dosyaları
 
-- `Chicken Sound Effect.mp3`
-- `İnek Sesi.ogg.opus`
-- `Satın Alım Satım.mp3`
-- `Korna.mp3`
-- `Oyun Ana Ekran.mp3`
-- `Oyun Müziği.mp3`
-- `ekin_toplama.wav`
-
----
 
 ## 🎮 Kullanıcı Etkileşimleri
 
