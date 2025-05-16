@@ -4,34 +4,11 @@ import sys
 import random
 import math
 
-def random_direction():
-    angle = random.uniform(0, 2 * math.pi)
-    return math.cos(angle), math.sin(angle)
-
-def move_animal(animal, area_rect, speed=1):
-    # Hayvanın yönü yoksa başlat
-    if "dir" not in animal:
-        animal["dir"] = random_direction()
-    dx, dy = animal["dir"]
-    # Hareket et
-    animal["rect"].x += int(dx * speed)
-    animal["rect"].y += int(dy * speed)
-    # Sınır kontrolü
-    if not area_rect.contains(animal["rect"]):
-        # Sınıra çarptıysa tamamen rastgele yeni bir yön ver
-        animal["rect"].x -= int(dx * speed)
-        animal["rect"].y -= int(dy * speed)
-        animal["dir"] = random_direction()
-    # Ara sıra yön değiştir 
-    if random.random() < 0.03:
-        animal["dir"] = random_direction()
-
-# === Ayarlar ===
 WIDTH, HEIGHT = 800, 700
 TILE_SIZE = 40
 GRID_WIDTH, GRID_HEIGHT = 7, 6  
 INFO_BAR_HEIGHT = 50  
-INFO_BAR_RECT = pygame.Rect(0, 0, WIDTH, INFO_BAR_HEIGHT)  
+INFO_BAR_RECT = pygame.Rect(0, 0, WIDTH, INFO_BAR_HEIGHT) 
 
 pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -39,7 +16,7 @@ pygame.display.set_caption("Gelişmiş Çiftlik Oyunu")
 clock = pygame.time.Clock()
 font = pygame.font.SysFont(None, 24)
 
-# === Renkler ===
+
 GREEN = (34, 139, 34)
 DARK_GREEN = (0, 100, 0)
 BROWN = (139, 69, 19)
@@ -52,7 +29,6 @@ GRAY = (100, 100, 100)
 RED = (255, 0, 0)
 BLACK = (0, 0, 0)
 
-# === Tohum Türleri ===
 TOHUM_TURLERI = {
     "buğday": {"büyüme_suresi": 5, "maliyet": 1, "satis_fiyati": 2},
     "mısır": {"büyüme_suresi": 7, "maliyet": 3, "satis_fiyati": 5},
@@ -62,7 +38,6 @@ TOHUM_TURLERI = {
     "ayçiçek": {"büyüme_suresi": 25, "maliyet": 10, "satis_fiyati": 30},
 }
 
-# Görselleri yükleme
 WHEAT_SEEDS_IMG = pygame.image.load("Assets/Urunler/Wheat_Seeds.png")
 WHEAT_STAGE_5_IMG = pygame.image.load("Assets/Urunler/Wheat_Stage_5.png")
 CORN_SEEDS_IMG = pygame.image.load("Assets/Urunler/Corn_Seeds.png")
@@ -102,13 +77,11 @@ COW_SOUND = pygame.mixer.Sound("Assets/Sounds/İnek Sesi.ogg.opus")
 SATINALIM_SOUND = pygame.mixer.Sound("Assets/Sounds/Satın Alım Satım.mp3")
 CAR_IMG = pygame.image.load("Assets/Builds/Araba.png")
 KORNA_SOUND = pygame.mixer.Sound("Assets/Sounds/Korna.mp3")
+ADAM_SAG_SHEET = pygame.image.load("Assets/Sprites/adamsag.png")         
+ADAM_SOL_SHEET = pygame.image.load("Assets/Sprites/adamsol.png")         
+ARKADAN_BAK_SHEET = pygame.image.load("Assets/Sprites/arkadanbak.png")   
+ONDEN_BAKIS_SHEET = pygame.image.load("Assets/Sprites/öndenbakış.png")   
 
-ADAM_SAG_SHEET = pygame.image.load("Assets/Sprites/adamsag.png")         # sağa bakan sprite sheet
-ADAM_SOL_SHEET = pygame.image.load("Assets/Sprites/adamsol.png")         # sola bakan sprite sheet
-ARKADAN_BAK_SHEET = pygame.image.load("Assets/Sprites/arkadanbak.png")   # yukarı bakan sprite sheet
-ONDEN_BAKIS_SHEET = pygame.image.load("Assets/Sprites/öndenbakış.png")   # aşağı bakan sprite sheet
-
-# Animasyon karelerini yükleyin
 def load_animation_frames(sprite_sheet, frame_width, frame_height):
     frames = []
     sheet_width, sheet_height = sprite_sheet.get_size()
@@ -123,19 +96,17 @@ def load_animation_frames(sprite_sheet, frame_width, frame_height):
         print("Hata: Sprite sheet'ten hiçbir kare yüklenemedi!")
     return frames
 
-
 def load_frames(sheet, frame_width, frame_height):
     frames = []
     sheet_width, _ = sheet.get_size()
     frame_count = sheet_width // frame_width
     for i in range(frame_count):
-        # Sınır aşımı kontrolü
         if (i + 1) * frame_width > sheet_width:
             break
         frame = sheet.subsurface(pygame.Rect(i * frame_width, 0, frame_width, frame_height))
         frames.append(frame)
     if not frames:
-        frames.append(sheet)  # Hiç kare yoksa tüm resmi ekle
+        frames.append(sheet) 
     return frames
 
 FRAMES_RIGHT = load_frames(ADAM_SAG_SHEET, 16, 18)
@@ -155,10 +126,36 @@ def load_agac_frames(sheet, frame_width=64, frame_height=64):
 AGAC_SHEET = pygame.image.load("Assets/Sprites/ağac.png")
 AGAC_FRAMES = load_agac_frames(AGAC_SHEET, 64, 64)
 AGAC_ANIM_LEN = len(AGAC_FRAMES)
+def random_direction():
+    angle = random.uniform(0, 2 * math.pi)
+    return math.cos(angle), math.sin(angle)
+def move_animal(animal, area_rect, speed=1):
+    if "dir" not in animal:
+        animal["dir"] = random_direction()
+    dx, dy = animal["dir"]
+    animal["rect"].x += int(dx * speed)
+    animal["rect"].y += int(dy * speed)
+    if not area_rect.contains(animal["rect"]):
+        animal["rect"].x -= int(dx * speed)
+        animal["rect"].y -= int(dy * speed)
+        animal["dir"] = random_direction()
+    if random.random() < 0.03:
+        animal["dir"] = random_direction()
+TAVUK_SHEET = pygame.image.load("Assets/Sprites/tavuk.png")
+def load_tavuk_frames(sheet, frame_width=16, frame_height=16):
+    frames = []
+    sheet_width, _ = sheet.get_size()
+    frame_count = sheet_width // frame_width
+    for i in range(frame_count):
+        frame = sheet.subsurface(pygame.Rect(i * frame_width, 0, frame_width, frame_height))
+        frames.append(frame)
+    return frames
+
+TAVUK_FRAMES = load_tavuk_frames(TAVUK_SHEET, 16, 16)
+TAVUK_ANIM_LEN = len(TAVUK_FRAMES)
 
 class Player:
-  def __init__(self, x, y):
-    
+    def __init__(self, x, y):
         self.rect = pygame.Rect(x * TILE_SIZE + 100, y * TILE_SIZE + 100, TILE_SIZE, TILE_SIZE)
         self.inventory = {
             "tohum_buğday": 5,
@@ -185,11 +182,10 @@ class Player:
 
     def move(self, dx, dy):
         new_rect = self.rect.move(dx * TILE_SIZE, dy * TILE_SIZE)
-
         if new_rect.left < 0 or new_rect.right > WIDTH or new_rect.top < 0 or new_rect.bottom > HEIGHT:
             return
         if INFO_BAR_RECT.colliderect(new_rect):
-            return        
+            return
         def upper_part(rect, bottom_margin=30):
             return pygame.Rect(rect.x, rect.y, rect.width, rect.height - bottom_margin)
 
@@ -214,7 +210,6 @@ class Player:
 
     def update_animation(self):
         now = pygame.time.get_ticks()
-        
         if now - self.last_anim_update > 150:
             if self.direction == "right":
                 frame_count = len(FRAMES_RIGHT)
@@ -229,18 +224,12 @@ class Player:
 
 class Tile:
     def __init__(self):
-        self.tilled = False  # Tarla sürülmüş mü?
+        self.tilled = False  
         new_rect = self.rect.move(dx * TILE_SIZE, dy * TILE_SIZE)
-
-        # Ekran sınırları içinde mi?
         if new_rect.left < 0 or new_rect.right > WIDTH or new_rect.top < 0 or new_rect.bottom > HEIGHT:
-            return  # Ekran sınırlarını aşarsa hareket etme
-
-        # Bilgi çubuğu alanına çarpmıyor mu?
+            return 
         if INFO_BAR_RECT.colliderect(new_rect):
-            return  # Bilgi çubuğuna çarptığında hareket etme
-
-        # Binalarla çakışıyor mu?
+            return  
         if not (new_rect.colliderect(AHIR_RECT) or
                 new_rect.colliderect(KUMES_RECT) or
                 new_rect.colliderect(IMALATHANE_RECT) or
@@ -265,64 +254,68 @@ class Tile:
 
 class Tile:
     def __init__(self):
-        self.tilled = False  # Tarla sürülmüş mü?
-        self.crop = None  # Ekili ürün
-        self.planted_time = None  # Olgunlaşma süresinin başladığı zaman
-        self.watered = False  # Sulanmış mı?
+        self.tilled = False  
+        self.crop = None  
+        self.planted_time = None  
+        self.watered = False  
 
     def till(self):
-        # Tarlayı sürme işlemi
         self.tilled = True
 
     def plant(self, tohum_turu):
         if self.tilled and self.crop is None:
             self.crop = tohum_turu
-            self.watered = False  # Sulanmadığı için olgunlaşma başlamaz
-            self.planted_time = None  # Olgunlaşma süresi başlamaz
-            return True  # Ekim başarılı
-        return False  # Ekim başarısız
+            self.watered = False 
+            self.planted_time = None  
+            return True  
+        return False  
 
     def water(self):
         if self.crop and not self.watered:
             self.watered = True
-            self.planted_time = time.time()  # Sulandıktan sonra olgunlaşma süresi başlar
-            return True  # Sulama başarılı
-        return False  # Sulama başarısız
+            self.planted_time = time.time()  
+            return True 
+        return False  
 
     def harvest(self):
-        # Hasat işlemi
         if self.crop and self.watered:
             elapsed = time.time() - self.planted_time if self.planted_time else 0
             if elapsed >= TOHUM_TURLERI[self.crop]["büyüme_suresi"]:
-                harvested_crop = self.crop  # Hasat edilen ürünü kaydet
+                harvested_crop = self.crop 
                 self.crop = None
                 self.tilled = False
                 self.planted_time = None
                 self.watered = False
-                return harvested_crop  # Hasat edilen ürünün adını döndür
-        return None  # Hasat başarısız
-# === Başlat ===
+                return harvested_crop  
+        return None  
+
 player = Player(0, 0)
+player.rect.x = (WIDTH - TILE_SIZE) // 2
+player.rect.y = (HEIGHT - TILE_SIZE) // 2
 farm_grid = [[Tile() for _ in range(GRID_WIDTH)] for _ in range(GRID_HEIGHT)]
 
-# Alan koordinatları (sadece çizim ve sınır için)
 TARLA_RECT = pygame.Rect(100, 100, GRID_WIDTH * TILE_SIZE, GRID_HEIGHT * TILE_SIZE)
-AHIR_RECT = pygame.Rect(450, 100, 150, 120)  # Ahırın boyutları ve konumu genişletildi
-KUMES_RECT = pygame.Rect(625, 100, 150, 120)  # Kümesin boyutları ve konumu genişletildi
+AHIR_RECT = pygame.Rect(450, 100, 150, 120)  
+KUMES_RECT = pygame.Rect(625, 100, 150, 120)  
 IMALATHANE_RECT = pygame.Rect(325, 500, 230,120)
-SATIS_RECT = pygame.Rect(625, 500, 150, 120)  # Satış alanı genişletildi
+SATIS_RECT = pygame.Rect(625, 500, 150, 120)  
 
-# === Etkileşim Alanları ===
-AHIR_INTERACTION_AREA = pygame.Rect(AHIR_RECT.x - 20, AHIR_RECT.y - 20, AHIR_RECT.width + 40, AHIR_RECT.height + 40)
-KUMES_INTERACTION_AREA = pygame.Rect(KUMES_RECT.x - 20, KUMES_RECT.y - 20, KUMES_RECT.width + 40,
-                                     KUMES_RECT.height + 40)
+AHIR_INTERACTION_AREA = pygame.Rect(
+    AHIR_RECT.x - 20,
+    AHIR_RECT.y - 20,
+    AHIR_RECT.width + 40,
+    AHIR_RECT.height + 70  
+)
+KUMES_INTERACTION_AREA = pygame.Rect(
+    KUMES_RECT.x - 20,
+    KUMES_RECT.y - 20,
+    KUMES_RECT.width + 40,
+    KUMES_RECT.height + 70  )
 IMALATHANE_INTERACTION_AREA = pygame.Rect(IMALATHANE_RECT.x - 20, IMALATHANE_RECT.y - 20, IMALATHANE_RECT.width + 40,
                                           IMALATHANE_RECT.height + 40)
 SATIS_INTERACTION_AREA = pygame.Rect(SATIS_RECT.x - 20, SATIS_RECT.y - 20, SATIS_RECT.width + 40,
                                      SATIS_RECT.height + 40)
 
-
-# Ahırdaki ineklerin durumları
 cows = [
     {"rect": pygame.Rect(200, 150, 60, 60), "type": "cow", "milk": False, "fed_time": None},
     {"rect": pygame.Rect(400, 150, 60, 60), "type": "cow", "milk": False, "fed_time": None},
@@ -332,7 +325,6 @@ cows = [
     {"rect": pygame.Rect(600, 350, 60, 60), "type": "cow", "milk": False, "fed_time": None},
 ]
 
-# Kümesdeki tavukların durumları
 chickens = [
     {"rect": pygame.Rect(200, 150, 60, 60), "type": "chicken", "egg": False, "fed_time": None},
     {"rect": pygame.Rect(400, 150, 60, 60), "type": "chicken", "egg": False, "fed_time": None},
@@ -342,7 +334,6 @@ chickens = [
     {"rect": pygame.Rect(600, 350, 60, 60), "type": "chicken", "egg": False, "fed_time": None},
 ]
 
-# İmalathane üretim durumu (global)
 current_production = {
     "product": None,
     "start_time": None
@@ -359,17 +350,15 @@ def draw_farm():
         for x in range(GRID_WIDTH):
             rect = pygame.Rect(100 + x * TILE_SIZE, 100 + y * TILE_SIZE, TILE_SIZE, TILE_SIZE)
             tile = farm_grid[y][x]
-            
             if tile.tilled:
                 screen.blit(pygame.transform.scale(FLOORING_TILLED_IMG, rect.size), rect.topleft)
             else:
                 screen.blit(pygame.transform.scale(FLOORING_UNTILLED_IMG, rect.size), rect.topleft)
-
             if tile.crop:
                 elapsed = time.time() - tile.planted_time if tile.planted_time else 0
                 growth_time = TOHUM_TURLERI[tile.crop]["büyüme_suresi"]
 
-                if elapsed < growth_time: 
+                if elapsed < growth_time:  
                     if tile.crop == "buğday":
                         screen.blit(pygame.transform.scale(WHEAT_SEEDS_IMG, rect.size), rect.topleft)
                     elif tile.crop == "mısır":
@@ -383,15 +372,15 @@ def draw_farm():
                     elif tile.crop == "ayçiçek":
                         screen.blit(pygame.transform.scale(SUNFLOWER_SEEDS_IMG, rect.size), rect.topleft)
 
-                    # Büyüme çubuğu
+                    
                     progress = min(elapsed / growth_time, 1)  
                     bar_width = TILE_SIZE - 10
                     bar_height = 5
                     bar_x = rect.x + 5
                     bar_y = rect.y + TILE_SIZE - 10
-                    pygame.draw.rect(screen, WHITE, (bar_x, bar_y, bar_width, bar_height), 2)  # Çerçeve
-                    pygame.draw.rect(screen, GREEN, (bar_x, bar_y, int(bar_width * progress), bar_height))  # Dolan kısım
-                else: 
+                    pygame.draw.rect(screen, WHITE, (bar_x, bar_y, bar_width, bar_height), 2)  
+                    pygame.draw.rect(screen, GREEN, (bar_x, bar_y, int(bar_width * progress), bar_height)) 
+                else:  
                     if tile.crop == "buğday":
                         screen.blit(pygame.transform.scale(WHEAT_STAGE_5_IMG, rect.size), rect.topleft)
                     elif tile.crop == "mısır":
@@ -405,15 +394,12 @@ def draw_farm():
                     elif tile.crop == "ayçiçek":
                         screen.blit(pygame.transform.scale(SUNFLOWER_STAGE_6_IMG, rect.size), rect.topleft)
 
-            
             if tile.watered:
-                pygame.draw.rect(screen, WATER, rect, 3) 
+                pygame.draw.rect(screen, WATER, rect, 3)  
             else:
                 pygame.draw.rect(screen, BROWN, rect, 3)  
 
-
 def get_tile_coords():
-    # Karakterin merkezini kullan
     gx = (player.rect.centerx - 100) // TILE_SIZE
     gy = (player.rect.centery - 100) // TILE_SIZE
     if 0 <= gx < GRID_WIDTH and 0 <= gy < GRID_HEIGHT:
@@ -421,14 +407,13 @@ def get_tile_coords():
     return None, None
 
 def check_interaction():
-    # Satış alanı ile çakışmayı kontrol et
     if player.rect.colliderect(SATIS_RECT):
-        print("Satış alanına girdiniz!")  # Test için
+        print("Satış alanına girdiniz!") 
         return "satış"
     return None
 
 def update_cow_animation(cow, animation_frames, frame_delay):
-    if not animation_frames:  # Eğer animasyon kareleri boşsa
+    if not animation_frames:  
         print("Hata: Animasyon kareleri boş!")
         return
     current_time = pygame.time.get_ticks()
@@ -439,21 +424,20 @@ def update_cow_animation(cow, animation_frames, frame_delay):
 def satış_arayüzü():
     running = True
     global car_moving, car_on_road, car_progress, car_hide_time
-   
-    margin = 20 
+
+  
+    margin = 20  
     spacing = 10  
     width = 100  
     height = 60  
     cols_sell = 3  
-    cols_buy = 1 
+    cols_buy = 1  
 
-    # Kaydırma için ayarlar
     scroll_y_buy = 0  
     scroll_y_sell = 0  
     max_scroll_buy = 0  
     max_scroll_sell = 0  
-
-
+    
     buy_data = {
         "tohum_buğday": {"image": WHEAT_SEEDS_IMG, "price": 1},
         "tohum_mısır": {"image": CORN_SEEDS_IMG, "price": 3},
@@ -483,55 +467,26 @@ def satış_arayüzü():
         "ayran": {"image": pygame.image.load("Assets/Urunler/ayran.webp"), "price": 120},
     }
 
-    buy_rects = [] 
+    buy_rects = []  
     sell_rects = []  
 
-    
     rows_buy = len(buy_data)  
-    rows_sell = (len(sell_data) + cols_sell - 1) // cols_sell  
+    rows_sell = (len(sell_data) + cols_sell - 1) // cols_sell 
     total_height_buy = rows_buy * (height + spacing) + margin * 2
     total_height_sell = rows_sell * (height + spacing) + margin * 2
-    max_scroll_buy = max(0, total_height_buy - HEIGHT + 100) 
+    max_scroll_buy = max(0, total_height_buy - HEIGHT + 100)  
     max_scroll_sell = max(0, total_height_sell - HEIGHT + 100)  
 
     while running:
         screen.fill(GRAY)
         buy_rects.clear()
         sell_rects.clear()
-      
         screen.blit(font.render("SATIŞ MENÜSÜ", True, WHITE), (WIDTH // 2 - 100, 20))
-
-        
         screen.blit(font.render("TOHUM SATIN AL", True, WHITE), (margin, 50))
         y_buy = margin + 80 - scroll_y_buy
         for product, data in buy_data.items():
-            # Ürün kutusu
             product_rect = pygame.Rect(margin, y_buy, width, height)
             buy_rects.append((product_rect, product))
-            pygame.draw.rect(screen, WHITE, product_rect)
-            pygame.draw.rect(screen, BLACK, product_rect, 2)
-
-            scaled_image = pygame.transform.scale(data["image"], (width - 10, height - 30))
-            screen.blit(scaled_image, (product_rect.x + 5, product_rect.y + 5))
-
-            price_text = font.render(f"{data['price']}$", True, BLACK)
-            screen.blit(price_text, (product_rect.x + 5, product_rect.y + height - 20))
-
-            y_buy += height + spacing
-
-        screen.blit(font.render("ÜRÜN SATIŞI", True, WHITE), (WIDTH // 2 - 50, 50))
-        y_sell = margin + 80 - scroll_y_sell
-        for i, (product, data) in enumerate(sell_data.items()):
-            row = i // cols_sell 
-            col = i % cols_sell 
-
-          
-            x = WIDTH // 2 + col * (width + spacing)
-            y = y_sell + row * (height + spacing)
-
-         
-            product_rect = pygame.Rect(x, y, width, height)
-            sell_rects.append((product_rect, product))
             pygame.draw.rect(screen, WHITE, product_rect)
             pygame.draw.rect(screen, BLACK, product_rect, 2)
 
@@ -539,18 +494,36 @@ def satış_arayüzü():
             scaled_image = pygame.transform.scale(data["image"], (width - 10, height - 30))
             screen.blit(scaled_image, (product_rect.x + 5, product_rect.y + 5))
 
-        
+            
             price_text = font.render(f"{data['price']}$", True, BLACK)
             screen.blit(price_text, (product_rect.x + 5, product_rect.y + height - 20))
 
-       
+            y_buy += height + spacing
+
+        
+        screen.blit(font.render("ÜRÜN SATIŞI", True, WHITE), (WIDTH // 2 - 50, 50))
+        y_sell = margin + 80 - scroll_y_sell
+        for i, (product, data) in enumerate(sell_data.items()):
+            row = i // cols_sell  
+            col = i % cols_sell  
+            x = WIDTH // 2 + col * (width + spacing)
+            y = y_sell + row * (height + spacing)
+            product_rect = pygame.Rect(x, y, width, height)
+            sell_rects.append((product_rect, product))
+            pygame.draw.rect(screen, WHITE, product_rect)
+            pygame.draw.rect(screen, BLACK, product_rect, 2)
+            scaled_image = pygame.transform.scale(data["image"], (width - 10, height - 30))
+            screen.blit(scaled_image, (product_rect.x + 5, product_rect.y + 5))
+            price_text = font.render(f"{data['price']}$", True, BLACK)
+            screen.blit(price_text, (product_rect.x + 5, product_rect.y + height - 20))
+
         exit_button = pygame.Rect(WIDTH // 2 - 50, HEIGHT - 50, 100, 40)
         pygame.draw.rect(screen, RED, exit_button)
         screen.blit(font.render("Çıkış", True, WHITE), (exit_button.x + 20, exit_button.y + 10))
 
         pygame.display.flip()
 
-        
+   
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -559,15 +532,13 @@ def satış_arayüzü():
                 if event.button == 1:  
                     mouse_x, mouse_y = pygame.mouse.get_pos()
 
-                 
                     if exit_button.collidepoint(mouse_x, mouse_y):
                         return
 
-                  
                     for rect, product in buy_rects:
                         if rect.collidepoint(mouse_x, mouse_y):
                             data = buy_data[product]
-                            if player.inventory.get("para", 0) >= data["price"]: 
+                            if player.inventory.get("para", 0) >= data["price"]:  
                                 player.inventory["para"] -= data["price"]
                                 player.inventory[product] = player.inventory.get(product, 0) + 1
                                 SATINALIM_SOUND.play()  
@@ -575,11 +546,10 @@ def satış_arayüzü():
                             else:
                                 print("Yeterli paranız yok!")
 
-                  
                     for rect, product in sell_rects:
                         if rect.collidepoint(mouse_x, mouse_y):
                             data = sell_data[product]
-                            if player.inventory.get(product, 0) > 0: 
+                            if player.inventory.get(product, 0) > 0:  
                                 player.inventory[product] -= 1
                                 player.inventory["para"] += data["price"]
                                 SATINALIM_SOUND.play()  
@@ -620,7 +590,6 @@ def kümes_arayuzu():
     running = True
     while running:
         screen.blit(pygame.transform.scale(KUMES_IC_IMG, (WIDTH, HEIGHT)), (0, 0))
-
         for animal in chickens:
             if "dx" not in animal or "dy" not in animal:
                 animal["dx"] = random.choice([-2, -1, 0, 1, 2])
@@ -637,6 +606,7 @@ def kümes_arayuzu():
             else:
                 if not any(new_rect.colliderect(other["rect"]) for other in chickens if other != animal):
                     animal["rect"] = new_rect
+
             now = pygame.time.get_ticks()
             if now - animal["last_anim_update"] > 200:
                 animal["anim_frame"] = (animal["anim_frame"] + 1) % TAVUK_ANIM_LEN
@@ -719,6 +689,7 @@ def kümes_arayuzu():
                             print("Yeterli mısır yok!")
             if not collision:
                 player_rect = new_rect
+
 def ahir_arayuzu():
     global cows
     ahir_rect = pygame.Rect(40, 40, WIDTH - 120, HEIGHT - 40)
@@ -727,6 +698,7 @@ def ahir_arayuzu():
     anim_frame = 0
     last_anim_update = 0
 
+   
     for i, animal in enumerate(cows):
         while True:
             animal["rect"].x = random.randint(50, WIDTH - 110)
@@ -757,7 +729,7 @@ def ahir_arayuzu():
 
             inek_img = pygame.transform.scale(COW_IMG, (60, 60))
             screen.blit(inek_img, animal["rect"].topleft)
-
+            
             if animal["fed_time"] or animal["milk"]:
                 elapsed_time = time.time() - animal["fed_time"] if animal["fed_time"] else 60
                 progress = min(elapsed_time / 60, 1)
@@ -811,7 +783,7 @@ def ahir_arayuzu():
         if keys[pygame.K_UP]: dy = -TILE_SIZE; direction = "up"
         if keys[pygame.K_DOWN]: dy = TILE_SIZE; direction = "down"
 
-        new_rect = player_rect.move(dx * 0.2, dy * 0.2) 
+        new_rect = player_rect.move(dx * 0.2, dy * 0.2)  
         if ahir_rect.contains(new_rect):
             collision = False
             for animal in cows:
@@ -833,7 +805,6 @@ def ahir_arayuzu():
             if not collision:
                 player_rect = new_rect
 
-# İmalathane ürünleri ve gereksinimleri
 products = [
     {"name": "Yoğurt", "requirements": {"süt": 2}, "time": 180, "price": 75},
     {"name": "Peynir", "requirements": {"süt": 5}, "time": 300, "price": 150},
@@ -849,12 +820,12 @@ products = [
 def imalathane_arayuzu():
     global current_production
     running = True
+
     margin = 20 
     spacing = 10  
-    cols = 2  
-    row_height = 100  
-    col_width = (WIDTH - 2 * margin - (cols - 1) * spacing) // cols 
-
+    cols = 2 
+    row_height = 100 
+    col_width = (WIDTH - 2 * margin - (cols - 1) * spacing) // cols  
     product_images = {
         "Yoğurt": pygame.image.load("Assets/Urunler/Mayonnaise.png"),
         "Peynir": pygame.image.load("Assets/Urunler/Cheese.png"),
@@ -885,14 +856,13 @@ def imalathane_arayuzu():
     while running:
         screen.fill(GRAY)
 
-        
         screen.blit(font.render("İMALATHANE", True, WHITE), (WIDTH // 2 - 50, 20))
 
         for i, product in enumerate(products):
             row = i // cols  
             col = i % cols  
 
-            
+           
             x = margin + col * (col_width + spacing)
             y = margin + 50 + row * (row_height + spacing)
 
@@ -901,7 +871,7 @@ def imalathane_arayuzu():
             pygame.draw.rect(screen, WHITE, product_rect)
             pygame.draw.rect(screen, BLACK, product_rect, 2)
 
-         
+           
             if product["name"] in product_images:
                 product_image = pygame.transform.scale(product_images[product["name"]], (row_height - 20, row_height - 20))
                 screen.blit(product_image, (product_rect.x + 10, product_rect.y + 10))
@@ -917,7 +887,6 @@ def imalathane_arayuzu():
                     screen.blit(amount_text, (req_x + 20, req_y + 20))
                     req_x += 40
 
-           
             time_text = font.render(f"Üretim Süresi: {product['time']} sn", True, BLACK)
             screen.blit(time_text, (product_rect.x + row_height, product_rect.y + 50))
 
@@ -937,26 +906,24 @@ def imalathane_arayuzu():
                 percent_text = font.render(f"%{int(progress*100)}", True, BLACK)
                 screen.blit(percent_text, (bar_x + bar_width + 8, bar_y))
 
-       
         if current_production["product"]:
             product = current_production["product"]
             elapsed_time = time.time() - current_production["start_time"]
             total_time = product["time"]
             if elapsed_time >= total_time:
-             
                 product_name = product["name"].lower()
                 player.inventory[product_name] = player.inventory.get(product_name, 0) + 1
                 print(f"{product['name']} üretildi!")
                 current_production["product"] = None
                 current_production["start_time"] = None
 
-      
         exit_button = pygame.Rect(WIDTH // 2 - 50, HEIGHT - 50, 100, 40)
         pygame.draw.rect(screen, RED, exit_button)
         screen.blit(font.render("Çıkış", True, WHITE), (exit_button.x + 20, exit_button.y + 10))
 
         pygame.display.flip()
 
+      
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -964,11 +931,9 @@ def imalathane_arayuzu():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:  
                     mouse_x, mouse_y = pygame.mouse.get_pos()
-
-                  
                     if exit_button.collidepoint(mouse_x, mouse_y):
                         return
-                    
+
                     for i, product in enumerate(products):
                         row = i // cols
                         col = i % cols
@@ -988,7 +953,6 @@ def imalathane_arayuzu():
                             else:
                                 print(f"{current_production['product']['name']} üretimi devam ediyor!")
 
-
 def envanter_arayuzu():
     running = True
     slot_width = 80  
@@ -999,7 +963,6 @@ def envanter_arayuzu():
     inventory_start_x = (WIDTH - (cols * slot_width + (cols - 1) * slot_margin)) // 2
     inventory_start_y = (HEIGHT - (rows * slot_height + (rows - 1) * slot_margin)) // 2
 
- 
     product_images = {
         "tohum_buğday": WHEAT_SEEDS_IMG,
         "tohum_mısır": CORN_SEEDS_IMG,
@@ -1029,88 +992,103 @@ def envanter_arayuzu():
     while running:
         screen.fill(GRAY)
 
-      
         screen.blit(font.render("ENVANTER", True, WHITE), (WIDTH // 2 - 50, 50))
-
-        
         x = inventory_start_x
         y = inventory_start_y
         for i, (item, amount) in enumerate(player.inventory.items()):
             if i >= rows * cols:
                 break  
 
-            
             slot_rect = pygame.Rect(x, y, slot_width, slot_height)
             pygame.draw.rect(screen, WHITE, slot_rect)
             pygame.draw.rect(screen, BLACK, slot_rect, 2)
 
-           
             if item in product_images:
                 image = pygame.transform.scale(product_images[item], (slot_width - 10, slot_height - 10))
                 screen.blit(image, (x + 5, y + 5))
 
-            
             if amount > 0:
                 text = font.render(str(amount), True, BLACK)
                 screen.blit(text, (x + slot_width - 20, y + slot_height - 20))
 
-           
             x += slot_width + slot_margin
-            if (i + 1) % cols == 0:  
+            if (i + 1) % cols == 0: 
                 x = inventory_start_x
                 y += slot_height + slot_margin
 
-   
+      
         exit_button = pygame.Rect(WIDTH // 2 - 50, HEIGHT - 80, 100, 40)
         pygame.draw.rect(screen, RED, exit_button)
         screen.blit(font.render("Çıkış", True, WHITE), (exit_button.x + 20, exit_button.y + 10))
 
         pygame.display.flip()
 
-     
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE: 
+                if event.key == pygame.K_ESCAPE:  
                     running = False
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:  
                 mouse_x, mouse_y = pygame.mouse.get_pos()
                 if exit_button.collidepoint(mouse_x, mouse_y):
                     running = False
+                    
+
 
 def ana_menu():
+    menu_running = True
+    arka_plan = pygame.image.load("Assets/Backgrounds/arka_plan.jpg")
+    arka_plan = pygame.transform.scale(arka_plan, (WIDTH, HEIGHT))
+    logo = pygame.image.load("Assets/Backgrounds/logo.png")
+    logo = pygame.transform.scale(logo, (200, 160))
 
-# === Ana Döngü ===
-selected_seed = "buğday"  # Varsayılan seçili tohum
+    buton_genislik = 200
+    buton_yukseklik = 60
+    buton_x = (WIDTH - buton_genislik) // 2 + 30
+    buton_y = HEIGHT // 2 + 200
 
+    pygame.mixer.music.load("Assets/Sounds/Oyun Ana Ekran.mp3")
+    pygame.mixer.music.set_volume(0.3)  
+    pygame.mixer.music.play(-1)  
+
+    while menu_running:
+        screen.blit(arka_plan, (0, 0))
+        screen.blit(logo, (10, 10))
+
+        oyna_buton = pygame.Rect(buton_x, buton_y, buton_genislik, buton_yukseklik)
+        pygame.draw.rect(screen, GREEN, oyna_buton)
+        pygame.draw.rect(screen, BLACK, oyna_buton, 3)
+        yazi = font.render("Oyna", True, WHITE)
+        screen.blit(yazi, (buton_x + (buton_genislik - yazi.get_width()) // 2, buton_y + (buton_yukseklik - yazi.get_height()) // 2))
+        pygame.display.flip()
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                mouse_x, mouse_y = pygame.mouse.get_pos()
+                if oyna_buton.collidepoint(mouse_x, mouse_y):
+                    pygame.mixer.music.stop()  
+                    menu_running = False
+
+selected_seed = "buğday"  
 ana_menu()
-
-
-
-pygame.mixer.music.load("Oyun Müziği.mp3")
+pygame.mixer.music.load("Assets/Sounds/Oyun Müziği.mp3")
 pygame.mixer.music.set_volume(0.3)
-pygame.mixer.music.play(-1)  # Oyun boyunca döngüde çalsın
-
+pygame.mixer.music.play(-1)  
 
 running = True
 while running:
-    # Haritayı doldur
     for y in range(0, HEIGHT, TILE_SIZE):
         for x in range(0, WIDTH, TILE_SIZE):
             if 600 <= y < 700:
                 screen.blit(pygame.transform.scale(YOL_IMG, (TILE_SIZE, TILE_SIZE)), (x, y))
             else:
                 screen.blit(pygame.transform.scale(FLOORING_IMG, (TILE_SIZE, TILE_SIZE)), (x, y))
-    # Bilgi çubuğunu çiz
-    pygame.draw.rect(screen, GRAY, INFO_BAR_RECT)
-
-    # Para miktarını sağ köşede göster
-    para_text = font.render(f"Para: {player.inventory.get('para', 0)}$", True, WHITE)
-    screen.blit(para_text, (WIDTH - para_text.get_width() - 10, 10))
-
-    # Seçili ürünün simgesini orta kısımda göster ve miktarını yaz
+    pygame.draw.rect(screen, GREEN, INFO_BAR_RECT)
     selected_seed = player.selected_seed
     if selected_seed:
         seed_image = {
@@ -1123,32 +1101,32 @@ while running:
         }.get(selected_seed)
 
         if seed_image:
-            scaled_seed_image = pygame.transform.scale(seed_image, (30, 30))  # Görseli küçült
-            screen.blit(scaled_seed_image, (WIDTH // 2 - 15, 10))  # Orta kısma yerleştir
-
-            # Seçili ürün miktarını yaz
+            scaled_seed_image = pygame.transform.scale(seed_image, (30, 30))
+            screen.blit(scaled_seed_image, (15, 10))
             seed_count = player.inventory.get(f"tohum_{selected_seed}", 0)
             count_text = font.render(str(seed_count), True, WHITE)
-            screen.blit(count_text, (WIDTH // 2 + 10, 10))  # Simgenin sağ üst köşesine yaz
+            screen.blit(count_text, (50, 10))
+            
+    envanter_text = font.render("Envanter (C)", True, WHITE)
+    screen.blit(envanter_text, (90, 15))
+    title_text = font.render("ÇİFTLİK OYUNU", True, WHITE)
+    screen.blit(title_text, ((WIDTH - title_text.get_width()) // 2, 10))
+    para_text = font.render(f"Para: {player.inventory.get('para', 0)}$", True, WHITE)
+    screen.blit(para_text, (WIDTH - para_text.get_width() - 10, 10))
 
-            draw_buildings()
+    draw_buildings()
     draw_farm()
-
-    # 3 animasyonlu ağaç çizimi (sol kenardan imalathaneye kadar)
     agac_y = 540
     agac_width = 64
     agac_height = 64
     agac_aralik = (IMALATHANE_RECT.x - 20 - agac_width * 3) // 4
-    # Animasyon karesi (her ağaç için farklı faz)
     agac_anim_frame = (pygame.time.get_ticks() // 200) % AGAC_ANIM_LEN
 
     for i in range(3):
         agac_x = agac_aralik + i * (agac_width + agac_aralik)
-        frame_idx = (agac_anim_frame + i) % AGAC_ANIM_LEN  # Her ağaç farklı fazda olsun
+        frame_idx = (agac_anim_frame + i) % AGAC_ANIM_LEN  
         frame = pygame.transform.scale(AGAC_FRAMES[frame_idx], (agac_width, agac_height))
         screen.blit(frame, (agac_x, agac_y))
-
-    # y 100 ve 540 arasına x=20'de 3 eşit aralıklı animasyonlu ağaç
     agac_x_dikey = 25
     agac_y1 = 100
     agac_y2 = 480
@@ -1164,19 +1142,49 @@ while running:
         frame = pygame.transform.scale(AGAC_FRAMES[frame_idx], (agac_width_dikey, agac_height_dikey))
         screen.blit(frame, (agac_x_dikey, agac_y))
 
-    # Karakteri çiz
     if player.direction == "right":
         char_img = FRAMES_RIGHT[player.anim_frame]
     elif player.direction == "left":
         char_img = FRAMES_LEFT[player.anim_frame]
     elif player.direction == "up":
         char_img = FRAMES_UP[player.anim_frame]
-    else:  # down
+    else:  
         char_img = FRAMES_DOWN[player.anim_frame]
 
     screen.blit(pygame.transform.scale(char_img, (TILE_SIZE, TILE_SIZE)), player.rect.topleft)
 
-    # İmalathane üretim kontrolü (arayüz dışında da çalışsın)
+    road_y = 600  
+    road_height = 100
+    car_height = int(road_height * 0.6)
+    car_width = int(CAR_IMG.get_width() * (car_height / CAR_IMG.get_height()))
+    car_y = road_y + (road_height - car_height) // 2
+    road_start_x = 20
+    road_end_x = WIDTH - car_width - 20
+
+    if 'car_progress' not in globals():
+        car_progress = 0.0
+        car_moving = False
+        car_on_road = True
+        car_hide_time = 0
+
+    if car_on_road:
+        if car_moving:
+            car_progress += 0.015 
+            if car_progress >= 1.0:
+                car_progress = 1.0
+                car_on_road = False
+                car_moving = False
+                car_hide_time = time.time()
+        car_x = int(road_start_x + (road_end_x - road_start_x) * car_progress)
+        car_scaled = pygame.transform.scale(CAR_IMG, (car_width, car_height))
+        screen.blit(car_scaled, (car_x, car_y))
+    else:
+        if time.time() - car_hide_time >= 7:
+                car_on_road = True
+                car_progress = 0.0
+                car_moving = False
+                KORNA_SOUND.play()
+            
     if current_production["product"]:
         product = current_production["product"]
         elapsed_time = time.time() - current_production["start_time"]
@@ -1194,29 +1202,16 @@ while running:
         if event.type == pygame.QUIT:
             running = False
         if event.type == pygame.KEYDOWN:
-            # Ahır etkileşimi
             if player.rect.colliderect(AHIR_INTERACTION_AREA) and event.key == pygame.K_RETURN:
-                ahir_arayuzu()  # Ahır arayüzüne geçiş
-
-            # Kümes etkileşimi
+                ahir_arayuzu()  
             if player.rect.colliderect(KUMES_INTERACTION_AREA) and event.key == pygame.K_RETURN:
-                kümes_arayuzu()  # Kümes arayüzüne geçiş
-
-            # İmalathane etkileşimi
+                kümes_arayuzu()  
             if player.rect.colliderect(IMALATHANE_INTERACTION_AREA) and event.key == pygame.K_RETURN:
-                imalathane_arayuzu()  # İmalathane arayüzüne geçiş
-
-            # Satış alanı etkileşimi
+                imalathane_arayuzu()  
             if player.rect.colliderect(SATIS_INTERACTION_AREA) and event.key == pygame.K_RETURN:
-                satış_arayüzü()  # Satış arayüzüne geçiş
-
-            # Envanter arayüzü
-            if event.key == pygame.K_c:  # Tuş değiştirildi
+                satış_arayüzü()  
+            if event.key == pygame.K_c:  
                 envanter_arayuzu()
-
-            # Seviye görevleri arayüzü
-            if event.key == pygame.K_i:
-                seviye_gorevleri_arayuzu()
 
     keys = pygame.key.get_pressed()
     dx = dy = 0
@@ -1230,7 +1225,6 @@ while running:
     else:
         player.anim_frame = 0
 
-    # Tohum türünü değiştirmek için tuşlar
     if keys[pygame.K_1]: player.selected_seed = "buğday"
     if keys[pygame.K_2]: player.selected_seed = "mısır"
     if keys[pygame.K_3]: player.selected_seed = "havuç"
@@ -1238,37 +1232,35 @@ while running:
     if keys[pygame.K_5]: player.selected_seed = "çilek"
     if keys[pygame.K_6]: player.selected_seed = "ayçiçek"
 
-    # === Tarla İşlemleri ===
-    if keys[pygame.K_t]:  # Tarlayı sür
+    if keys[pygame.K_t]: 
         gx, gy = get_tile_coords()
         if gx is not None and gy is not None:
             farm_grid[gy][gx].till()
             print(f"Tarlanın ({gx}, {gy}) koordinatındaki alan sürüldü.")
 
-    if keys[pygame.K_e]:  # Tohum ek
+    if keys[pygame.K_e]:  
         gx, gy = get_tile_coords()
         if gx is not None and gy is not None:
             selected_seed = player.selected_seed
-            # Tohum envanterde var mı ve tarla ekime uygun mu?
             if player.inventory[f"tohum_{selected_seed}"] > 0 and farm_grid[gy][gx].plant(selected_seed):
-                player.inventory[f"tohum_{selected_seed}"] -= 1  # Tohumu envanterden düş
-                EKIN_TOPLAMA_SOUND.play()  # SESİ ÇAL
+                player.inventory[f"tohum_{selected_seed}"] -= 1  
+                EKIN_TOPLAMA_SOUND.play() 
                 print(f"{selected_seed.capitalize()} ekildi!")
             else:
                 print("Ekim başarısız! Yeterli tohum yok veya tarla sürülmemiş.")
 
-    if keys[pygame.K_h]:  # Hasat yap
+    if keys[pygame.K_h]:  
         gx, gy = get_tile_coords()
         if gx is not None and gy is not None:
-            harvested_crop = farm_grid[gy][gx].harvest()  # Hasat edilen ürünü al
-            if harvested_crop:  # Eğer bir ürün hasat edildiyse
-                player.inventory[harvested_crop] += 1  # Ürünü envantere ekle
-                EKIN_TOPLAMA_SOUND.play()  # SESİ ÇAL
+            harvested_crop = farm_grid[gy][gx].harvest()  
+            if harvested_crop:  
+                player.inventory[harvested_crop] += 1  
+                EKIN_TOPLAMA_SOUND.play()  
                 print(f"{harvested_crop} hasat edildi!")
             else:
                 print("Hasat başarısız! Ürün henüz olgunlaşmamış veya sulanmamış.")
 
-    if keys[pygame.K_s]:  # Sulama yap
+    if keys[pygame.K_s]:  
         gx, gy = get_tile_coords()
         if gx is not None and gy is not None:
             if farm_grid[gy][gx].water():
@@ -1276,4 +1268,3 @@ while running:
             else:
                 print("Sulama başarısız! Ekili bir ürün yok veya zaten sulanmış.")
 pygame.quit()
-
