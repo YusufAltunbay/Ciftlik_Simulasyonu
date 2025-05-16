@@ -631,8 +631,238 @@ products = [
 ]
 
 def imalathane_arayuzu():
+    global current_production
+    running = True
+    margin = 20 
+    spacing = 10  
+    cols = 2  
+    row_height = 100  
+    col_width = (WIDTH - 2 * margin - (cols - 1) * spacing) // cols 
+
+    product_images = {
+        "Yoğurt": pygame.image.load("Assets/Urunler/Mayonnaise.png"),
+        "Peynir": pygame.image.load("Assets/Urunler/Cheese.png"),
+        "Un": pygame.image.load("Assets/Urunler/flour.jpg"),
+        "Ayçiçek Yağı": pygame.image.load("Assets/Urunler/Oil.png"),
+        "Şeker": pygame.image.load("Assets/Urunler/Sugar.png"),
+        "Pasta": pygame.image.load("Assets/Urunler/Pink_Cake.png"),
+        "Kurabiye": pygame.image.load("Assets/Urunler/Cookie.png"),
+        "Dondurma": pygame.image.load("Assets/Urunler/Ice_cream.png"),
+        "Ayran": pygame.image.load("Assets/Urunler/ayran.webp"),
+    }
+
+    requirement_images = {
+        "süt": MILK_IMG,
+        "yumurta": EGG_IMG,
+        "buğday": WHEAT_IMG,
+        "mısır": CORN_IMG,
+        "havuç": CARROT_IMG,
+        "pancar": BEET_IMG,
+        "çilek": STRAWBERRY_IMG,
+        "ayçiçek": SUNFLOWER_IMG,
+        "un": pygame.image.load("Assets/Urunler/flour.jpg"),
+        "şeker": pygame.image.load("Assets/Urunler/Sugar.png"),
+        "yağ": pygame.image.load("Assets/Urunler/Oil.png"),
+        "yoğurt": pygame.image.load("Assets/Urunler/Mayonnaise.png"),
+    }
+
+    while running:
+        screen.fill(GRAY)
+
+        
+        screen.blit(font.render("İMALATHANE", True, WHITE), (WIDTH // 2 - 50, 20))
+
+        for i, product in enumerate(products):
+            row = i // cols  
+            col = i % cols  
+
+            
+            x = margin + col * (col_width + spacing)
+            y = margin + 50 + row * (row_height + spacing)
+
+            
+            product_rect = pygame.Rect(x, y, col_width, row_height)
+            pygame.draw.rect(screen, WHITE, product_rect)
+            pygame.draw.rect(screen, BLACK, product_rect, 2)
+
+         
+            if product["name"] in product_images:
+                product_image = pygame.transform.scale(product_images[product["name"]], (row_height - 20, row_height - 20))
+                screen.blit(product_image, (product_rect.x + 10, product_rect.y + 10))
+
+            
+            req_x = product_rect.x + row_height + 20
+            req_y = product_rect.y + 10
+            for item, amount in product["requirements"].items():
+                if item in requirement_images:
+                    req_image = pygame.transform.scale(requirement_images[item], (30, 30))
+                    screen.blit(req_image, (req_x, req_y))
+                    amount_text = font.render(str(amount), True, BLACK)
+                    screen.blit(amount_text, (req_x + 20, req_y + 20))
+                    req_x += 40
+
+           
+            time_text = font.render(f"Üretim Süresi: {product['time']} sn", True, BLACK)
+            screen.blit(time_text, (product_rect.x + row_height, product_rect.y + 50))
+
+            if (
+                current_production["product"] is not None
+                and current_production["product"]["name"] == product["name"]
+            ):
+                elapsed_time = time.time() - current_production["start_time"]
+                total_time = product["time"]
+                progress = min(elapsed_time / total_time, 1)
+                bar_width = col_width - 20
+                bar_height = 15
+                bar_x = product_rect.x + 10
+                bar_y = product_rect.y + row_height - bar_height - 10
+                pygame.draw.rect(screen, WHITE, (bar_x, bar_y, bar_width, bar_height), 2)
+                pygame.draw.rect(screen, GREEN, (bar_x, bar_y, int(bar_width * progress), bar_height))
+                percent_text = font.render(f"%{int(progress*100)}", True, BLACK)
+                screen.blit(percent_text, (bar_x + bar_width + 8, bar_y))
+
+       
+        if current_production["product"]:
+            product = current_production["product"]
+            elapsed_time = time.time() - current_production["start_time"]
+            total_time = product["time"]
+            if elapsed_time >= total_time:
+             
+                product_name = product["name"].lower()
+                player.inventory[product_name] = player.inventory.get(product_name, 0) + 1
+                print(f"{product['name']} üretildi!")
+                current_production["product"] = None
+                current_production["start_time"] = None
+
+      
+        exit_button = pygame.Rect(WIDTH // 2 - 50, HEIGHT - 50, 100, 40)
+        pygame.draw.rect(screen, RED, exit_button)
+        screen.blit(font.render("Çıkış", True, WHITE), (exit_button.x + 20, exit_button.y + 10))
+
+        pygame.display.flip()
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:  
+                    mouse_x, mouse_y = pygame.mouse.get_pos()
+
+                  
+                    if exit_button.collidepoint(mouse_x, mouse_y):
+                        return
+                    
+                    for i, product in enumerate(products):
+                        row = i // cols
+                        col = i % cols
+                        x = margin + col * (col_width + spacing)
+                        y = margin + 50 + row * (row_height + spacing)
+                        product_rect = pygame.Rect(x, y, col_width, row_height)
+                        if product_rect.collidepoint(mouse_x, mouse_y):
+                            if current_production["product"] is None:
+                                if all(player.inventory.get(item, 0) >= amount for item, amount in product["requirements"].items()):
+                                    current_production["product"] = product
+                                    current_production["start_time"] = time.time()
+                                    for item, amount in product["requirements"].items():
+                                        player.inventory[item] -= amount
+                                    print(f"{product['name']} üretimi başladı!")
+                                else:
+                                    print(f"{product['name']} için yeterli malzeme yok!")
+                            else:
+                                print(f"{current_production['product']['name']} üretimi devam ediyor!")
+
 
 def envanter_arayuzu():
+    running = True
+    slot_width = 80  
+    slot_height = 80  
+    slot_margin = 10  
+    rows = 4  
+    cols = 9  
+    inventory_start_x = (WIDTH - (cols * slot_width + (cols - 1) * slot_margin)) // 2
+    inventory_start_y = (HEIGHT - (rows * slot_height + (rows - 1) * slot_margin)) // 2
+
+ 
+    product_images = {
+        "tohum_buğday": WHEAT_SEEDS_IMG,
+        "tohum_mısır": CORN_SEEDS_IMG,
+        "tohum_havuç": CARROT_SEEDS_IMG,
+        "tohum_pancar": BEET_SEEDS_IMG,
+        "tohum_çilek": STRAWBERRY_SEEDS_IMG,
+        "tohum_ayçiçek": SUNFLOWER_SEEDS_IMG,
+        "buğday": WHEAT_IMG,
+        "mısır": CORN_IMG,
+        "havuç": CARROT_IMG,
+        "pancar": BEET_IMG,
+        "çilek": STRAWBERRY_IMG,
+        "ayçiçek": SUNFLOWER_IMG,
+        "süt": MILK_IMG,
+        "yumurta": EGG_IMG,
+        "yoğurt": pygame.image.load("Assets/Urunler/Mayonnaise.png"),
+        "peynir": pygame.image.load("Assets/Urunler/Cheese.png"),
+        "un": pygame.image.load("Assets/Urunler/flour.jpg"),
+        "ayçiçek yağı": pygame.image.load("Assets/Urunler/Oil.png"),
+        "şeker": pygame.image.load("Assets/Urunler/Sugar.png"),
+        "pasta": pygame.image.load("Assets/Urunler/Pink_Cake.png"),
+        "kurabiye": pygame.image.load("Assets/Urunler/Cookie.png"),
+        "dondurma": pygame.image.load("Assets/Urunler/Ice_cream.png"),
+        "ayran": pygame.image.load("Assets/Urunler/ayran.webp"),
+    }
+
+    while running:
+        screen.fill(GRAY)
+
+      
+        screen.blit(font.render("ENVANTER", True, WHITE), (WIDTH // 2 - 50, 50))
+
+        
+        x = inventory_start_x
+        y = inventory_start_y
+        for i, (item, amount) in enumerate(player.inventory.items()):
+            if i >= rows * cols:
+                break  
+
+            
+            slot_rect = pygame.Rect(x, y, slot_width, slot_height)
+            pygame.draw.rect(screen, WHITE, slot_rect)
+            pygame.draw.rect(screen, BLACK, slot_rect, 2)
+
+           
+            if item in product_images:
+                image = pygame.transform.scale(product_images[item], (slot_width - 10, slot_height - 10))
+                screen.blit(image, (x + 5, y + 5))
+
+            
+            if amount > 0:
+                text = font.render(str(amount), True, BLACK)
+                screen.blit(text, (x + slot_width - 20, y + slot_height - 20))
+
+           
+            x += slot_width + slot_margin
+            if (i + 1) % cols == 0:  
+                x = inventory_start_x
+                y += slot_height + slot_margin
+
+   
+        exit_button = pygame.Rect(WIDTH // 2 - 50, HEIGHT - 80, 100, 40)
+        pygame.draw.rect(screen, RED, exit_button)
+        screen.blit(font.render("Çıkış", True, WHITE), (exit_button.x + 20, exit_button.y + 10))
+
+        pygame.display.flip()
+
+     
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE: 
+                    running = False
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:  
+                mouse_x, mouse_y = pygame.mouse.get_pos()
+                if exit_button.collidepoint(mouse_x, mouse_y):
+                    running = False
 
 def ana_menu():
 
