@@ -110,10 +110,51 @@ ONDEN_BAKIS_SHEET = pygame.image.load("Assets/Sprites/öndenbakış.png")   # a�
 
 # Animasyon karelerini yükleyin
 def load_animation_frames(sprite_sheet, frame_width, frame_height):
+    frames = []
+    sheet_width, sheet_height = sprite_sheet.get_size()
+    for y in range(0, sheet_height, frame_height):
+        for x in range(0, sheet_width, frame_width):
+            if x + frame_width > sheet_width or y + frame_height > sheet_height:
+                print(f"Frame ({x}, {y}) sınırları aşıyor! Atlanıyor.")
+                continue
+            frame = sprite_sheet.subsurface(pygame.Rect(x, y, frame_width, frame_height))
+            frames.append(frame)
+    if not frames:
+        print("Hata: Sprite sheet'ten hiçbir kare yüklenemedi!")
+    return frames
+
 
 def load_frames(sheet, frame_width, frame_height):
+    frames = []
+    sheet_width, _ = sheet.get_size()
+    frame_count = sheet_width // frame_width
+    for i in range(frame_count):
+        # Sınır aşımı kontrolü
+        if (i + 1) * frame_width > sheet_width:
+            break
+        frame = sheet.subsurface(pygame.Rect(i * frame_width, 0, frame_width, frame_height))
+        frames.append(frame)
+    if not frames:
+        frames.append(sheet)  # Hiç kare yoksa tüm resmi ekle
+    return frames
+
+FRAMES_RIGHT = load_frames(ADAM_SAG_SHEET, 16, 18)
+FRAMES_LEFT = load_frames(ADAM_SOL_SHEET, 16, 18)
+FRAMES_UP = load_frames(ARKADAN_BAK_SHEET, 16, 18)
+FRAMES_DOWN = load_frames(ONDEN_BAKIS_SHEET, 16, 18)
 
 def load_agac_frames(sheet, frame_width=64, frame_height=64):
+    frames = []
+    sheet_width, sheet_height = sheet.get_size()
+    frame_count = sheet_width // frame_width
+    for i in range(frame_count):
+        frame = sheet.subsurface(pygame.Rect(i * frame_width, 0, frame_width, frame_height))
+        frames.append(frame)
+    return frames
+
+AGAC_SHEET = pygame.image.load("Assets/Sprites/ağac.png")
+AGAC_FRAMES = load_agac_frames(AGAC_SHEET, 64, 64)
+AGAC_ANIM_LEN = len(AGAC_FRAMES)
 
 class Player:
   def __init__(self, x, y):
