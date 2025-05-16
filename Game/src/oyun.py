@@ -437,6 +437,165 @@ def update_cow_animation(cow, animation_frames, frame_delay):
         cow["last_update_time"] = current_time
 
 def satış_arayüzü():
+    running = True
+    global car_moving, car_on_road, car_progress, car_hide_time
+   
+    margin = 20 
+    spacing = 10  
+    width = 100  
+    height = 60  
+    cols_sell = 3  
+    cols_buy = 1 
+
+    # Kaydırma için ayarlar
+    scroll_y_buy = 0  
+    scroll_y_sell = 0  
+    max_scroll_buy = 0  
+    max_scroll_sell = 0  
+
+
+    buy_data = {
+        "tohum_buğday": {"image": WHEAT_SEEDS_IMG, "price": 1},
+        "tohum_mısır": {"image": CORN_SEEDS_IMG, "price": 3},
+        "tohum_havuç": {"image": CARROT_SEEDS_IMG, "price": 5},
+        "tohum_pancar": {"image": BEET_SEEDS_IMG, "price": 10},
+        "tohum_çilek": {"image": STRAWBERRY_SEEDS_IMG, "price": 8},
+        "tohum_ayçiçek": {"image": SUNFLOWER_SEEDS_IMG, "price": 10},
+    }
+
+    sell_data = {
+        "buğday": {"image": WHEAT_IMG, "price": 2},
+        "mısır": {"image": CORN_IMG, "price": 5},
+        "havuç": {"image": CARROT_IMG, "price": 8},
+        "pancar": {"image": BEET_IMG, "price": 25},
+        "çilek": {"image": STRAWBERRY_IMG, "price": 15},
+        "ayçiçek": {"image": SUNFLOWER_IMG, "price": 30},
+        "süt": {"image": MILK_IMG, "price": 100},
+        "yumurta": {"image": EGG_IMG, "price": 35},
+        "yoğurt": {"image": pygame.image.load("Assets/Urunler/Mayonnaise.png"), "price": 75},
+        "peynir": {"image": pygame.image.load("Assets/Urunler/Cheese.png"), "price": 150},
+        "un": {"image": pygame.image.load("Assets/Urunler/flour.jpg"), "price": 20},
+        "ayçiçek yağı": {"image": pygame.image.load("Assets/Urunler/Oil.png"), "price": 200},
+        "şeker": {"image": pygame.image.load("Assets/Urunler/Sugar.png"), "price": 100},
+        "pasta": {"image": pygame.image.load("Assets/Urunler/Pink_Cake.png"), "price": 1000},
+        "kurabiye": {"image": pygame.image.load("Assets/Urunler/Cookie.png"), "price": 250},
+        "dondurma": {"image": pygame.image.load("Assets/Urunler/Ice_cream.png"), "price": 200},
+        "ayran": {"image": pygame.image.load("Assets/Urunler/ayran.webp"), "price": 120},
+    }
+
+    buy_rects = [] 
+    sell_rects = []  
+
+    
+    rows_buy = len(buy_data)  
+    rows_sell = (len(sell_data) + cols_sell - 1) // cols_sell  
+    total_height_buy = rows_buy * (height + spacing) + margin * 2
+    total_height_sell = rows_sell * (height + spacing) + margin * 2
+    max_scroll_buy = max(0, total_height_buy - HEIGHT + 100) 
+    max_scroll_sell = max(0, total_height_sell - HEIGHT + 100)  
+
+    while running:
+        screen.fill(GRAY)
+        buy_rects.clear()
+        sell_rects.clear()
+      
+        screen.blit(font.render("SATIŞ MENÜSÜ", True, WHITE), (WIDTH // 2 - 100, 20))
+
+        
+        screen.blit(font.render("TOHUM SATIN AL", True, WHITE), (margin, 50))
+        y_buy = margin + 80 - scroll_y_buy
+        for product, data in buy_data.items():
+            # Ürün kutusu
+            product_rect = pygame.Rect(margin, y_buy, width, height)
+            buy_rects.append((product_rect, product))
+            pygame.draw.rect(screen, WHITE, product_rect)
+            pygame.draw.rect(screen, BLACK, product_rect, 2)
+
+            scaled_image = pygame.transform.scale(data["image"], (width - 10, height - 30))
+            screen.blit(scaled_image, (product_rect.x + 5, product_rect.y + 5))
+
+            price_text = font.render(f"{data['price']}$", True, BLACK)
+            screen.blit(price_text, (product_rect.x + 5, product_rect.y + height - 20))
+
+            y_buy += height + spacing
+
+        screen.blit(font.render("ÜRÜN SATIŞI", True, WHITE), (WIDTH // 2 - 50, 50))
+        y_sell = margin + 80 - scroll_y_sell
+        for i, (product, data) in enumerate(sell_data.items()):
+            row = i // cols_sell 
+            col = i % cols_sell 
+
+          
+            x = WIDTH // 2 + col * (width + spacing)
+            y = y_sell + row * (height + spacing)
+
+         
+            product_rect = pygame.Rect(x, y, width, height)
+            sell_rects.append((product_rect, product))
+            pygame.draw.rect(screen, WHITE, product_rect)
+            pygame.draw.rect(screen, BLACK, product_rect, 2)
+
+           
+            scaled_image = pygame.transform.scale(data["image"], (width - 10, height - 30))
+            screen.blit(scaled_image, (product_rect.x + 5, product_rect.y + 5))
+
+        
+            price_text = font.render(f"{data['price']}$", True, BLACK)
+            screen.blit(price_text, (product_rect.x + 5, product_rect.y + height - 20))
+
+       
+        exit_button = pygame.Rect(WIDTH // 2 - 50, HEIGHT - 50, 100, 40)
+        pygame.draw.rect(screen, RED, exit_button)
+        screen.blit(font.render("Çıkış", True, WHITE), (exit_button.x + 20, exit_button.y + 10))
+
+        pygame.display.flip()
+
+        
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:  
+                    mouse_x, mouse_y = pygame.mouse.get_pos()
+
+                 
+                    if exit_button.collidepoint(mouse_x, mouse_y):
+                        return
+
+                  
+                    for rect, product in buy_rects:
+                        if rect.collidepoint(mouse_x, mouse_y):
+                            data = buy_data[product]
+                            if player.inventory.get("para", 0) >= data["price"]: 
+                                player.inventory["para"] -= data["price"]
+                                player.inventory[product] = player.inventory.get(product, 0) + 1
+                                SATINALIM_SOUND.play()  
+                                print(f"{product} satın alındı!")
+                            else:
+                                print("Yeterli paranız yok!")
+
+                  
+                    for rect, product in sell_rects:
+                        if rect.collidepoint(mouse_x, mouse_y):
+                            data = sell_data[product]
+                            if player.inventory.get(product, 0) > 0: 
+                                player.inventory[product] -= 1
+                                player.inventory["para"] += data["price"]
+                                SATINALIM_SOUND.play()  
+                                print(f"{product} satıldı!")
+                                if car_on_road and not car_moving:
+                                    car_moving = True
+                                    KORNA_SOUND.play()
+                            else:
+                                print(f"Yeterli {product} yok!")
+
+                elif event.button == 4:  
+                    scroll_y_buy = max(0, scroll_y_buy - 20)
+                    scroll_y_sell = max(0, scroll_y_sell - 20)
+                elif event.button == 5:  
+                    scroll_y_buy = min(max_scroll_buy, scroll_y_buy + 20)
+                    scroll_y_sell = min(max_scroll_sell, scroll_y_sell + 20)
 
 def kümes_arayuzu():
     global chickens
