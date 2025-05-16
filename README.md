@@ -2,9 +2,9 @@
 
 ## 👥 Proje Ekibi
 
-- **Ad Soyad 1**: [Kamil AY 22253051]
-- **Ad Soyad 2**: [Yusuf ALTUNBAY 22253072]
-- **Ad Soyad 3**: [Abdurrahman EKİN 22253078]
+- ### Kamil AY 22253051
+- ### Yusuf ALTUNBAY 22253072
+- ### Abdurrahman EKİN 22253078
 
 
 
@@ -72,9 +72,10 @@ Aşağıda projede kullanılan tüm görseller listelenmiştir:
 ![Araba](Game/Assets/Builds/Araba.png)
 
 ### Oyun İçi Görüntüler
--![Oyun_Ekranı](Game/Assets/Oyun_Ekranı.png)
--![Ahır_arayüzü](Game/Assets/Ahır_Arayüzü.png)
-
+-![Oyun_Ekranı](Game/Assets/OyunEkranı.png)
+-![Ahır_arayüzü](Game/Assets/AhırArayüzü.png)
+-![Satış](Game/Assets/SaışMenüsü.png)
+-![İmalathane](Game/Assets/İmalathaneArayüzü.png)
 
 ---
 
