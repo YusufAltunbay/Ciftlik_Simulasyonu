@@ -5,15 +5,33 @@ import random
 import math
 
 def random_direction():
+    angle = random.uniform(0, 2 * math.pi)
+    return math.cos(angle), math.sin(angle)
 
 def move_animal(animal, area_rect, speed=1):
+    # Hayvanın yönü yoksa başlat
+    if "dir" not in animal:
+        animal["dir"] = random_direction()
+    dx, dy = animal["dir"]
+    # Hareket et
+    animal["rect"].x += int(dx * speed)
+    animal["rect"].y += int(dy * speed)
+    # Sınır kontrolü
+    if not area_rect.contains(animal["rect"]):
+        # Sınıra çarptıysa tamamen rastgele yeni bir yön ver
+        animal["rect"].x -= int(dx * speed)
+        animal["rect"].y -= int(dy * speed)
+        animal["dir"] = random_direction()
+    # Ara sıra yön değiştir 
+    if random.random() < 0.03:
+        animal["dir"] = random_direction()
 
 # === Ayarlar ===
 WIDTH, HEIGHT = 800, 700
 TILE_SIZE = 40
-GRID_WIDTH, GRID_HEIGHT = 7, 6  # Tarla alanı (5x6)
-INFO_BAR_HEIGHT = 50  # Üstteki bilgi çubuğunun yüksekliği
-INFO_BAR_RECT = pygame.Rect(0, 0, WIDTH, INFO_BAR_HEIGHT)  # Bilgi çubuğu alanı
+GRID_WIDTH, GRID_HEIGHT = 7, 6  
+INFO_BAR_HEIGHT = 50  
+INFO_BAR_RECT = pygame.Rect(0, 0, WIDTH, INFO_BAR_HEIGHT)  
 
 pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
