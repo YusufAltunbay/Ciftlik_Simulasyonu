@@ -372,12 +372,28 @@ def draw_farm():
 
 
 def get_tile_coords():
+    # Karakterin merkezini kullan
+    gx = (player.rect.centerx - 100) // TILE_SIZE
+    gy = (player.rect.centery - 100) // TILE_SIZE
+    if 0 <= gx < GRID_WIDTH and 0 <= gy < GRID_HEIGHT:
+        return gx, gy
+    return None, None
 
 def check_interaction():
+    # Satış alanı ile çakışmayı kontrol et
+    if player.rect.colliderect(SATIS_RECT):
+        print("Satış alanına girdiniz!")  # Test için
+        return "satış"
+    return None
 
 def update_cow_animation(cow, animation_frames, frame_delay):
-
-print(COW_SPRITESHEET.get_size())  # Sprite sheet'in boyutlarını yazdır
+    if not animation_frames:  # Eğer animasyon kareleri boşsa
+        print("Hata: Animasyon kareleri boş!")
+        return
+    current_time = pygame.time.get_ticks()
+    if current_time - cow["last_update_time"] > frame_delay:
+        cow["current_frame"] = (cow["current_frame"] + 1) % len(animation_frames)
+        cow["last_update_time"] = current_time
 
 def satış_arayüzü():
 
